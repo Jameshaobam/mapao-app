@@ -2,17 +2,18 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mapao_app/controller/get_maincontroller.dart';
 import 'package:mapao_app/models/discover_get_model.dart';
 import 'package:mapao_app/screens/detail_discover.dart';
 
 class DiscoverItemList extends StatelessWidget {
-   DiscoverItemList({super.key, required this.discover, required this.index});
+  DiscoverItemList({super.key, required this.discover, required this.index});
   final Discover discover;
   final int index;
 
+  final MainController _mainController = Get.put(MainController());
   @override
   Widget build(BuildContext context) {
-
     return ClipRRect(
       borderRadius: BorderRadius.circular(20.0),
       child: Card(
@@ -20,9 +21,11 @@ class DiscoverItemList extends StatelessWidget {
         //TODO: margin is used to give space between the card items
         margin: const EdgeInsets.only(bottom: 13.0, left: 8.0, right: 8.0),
         child: ListTile(
-          onTap: () => Get.toNamed(DetailDiscoverPage.routeName,arguments: {
-            "id":discover.id,
-          }),
+          onTap: () {
+
+            _mainController.updateDiscover(discover);
+            Get.toNamed(DetailDiscoverPage.routeName);
+          },
           tileColor: Colors.white,
           title: Text(
             discover.title,

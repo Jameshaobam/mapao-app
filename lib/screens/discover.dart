@@ -1,10 +1,12 @@
 import 'dart:developer';
-import 'dart:ffi';
+
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mapao_app/utilities/utils.dart';
 
+import '../controller/get_maincontroller.dart';
 import '../networking/http.dart';
 import '../widgets/discover_item.dart';
 import '../models/discover_get_model.dart';
@@ -16,20 +18,20 @@ class DiscoverPage extends HookWidget {
   static String routeName = "/discover";
   final String title;
 
+  final MainController _mainController = Get.put(MainController());
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     var discoveries;
-    String category_title = Get.arguments["title"];
-    int category_id = Get.arguments["cat_id"];
+    String category_title = _mainController.categoryName.value;
+    int category_id = _mainController.categoryId.value;
     if (category_title == "All") {
-      discoveries = useQuery(
-        ["discoveries"],
-        getDiscovers,
-      );
+      discoveries = useQuery(["discoveries"], getDiscovers,
+          refetchOnMount: RefetchOnMount.always);
     } else {
       discoveries = useQuery(
-          ["discoveries"], () => getCategorizedDiscoveries(category_id));
+          ["discoveries"], () => getCategorizedDiscoveries(category_id),
+          refetchOnMount: RefetchOnMount.always);
     }
 
     return SafeArea(
@@ -46,11 +48,18 @@ class DiscoverPage extends HookWidget {
             ),
           ),
         ),
+
+        //TODO: use Builder() in body when useQuery is used;
         body: Builder(
           builder: (context) {
             if (discoveries.isLoading) {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(color: Colors.red),
+              );
+            }
+            if (discoveries.isFetching) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.red),
               );
             }
             if (discoveries.isError) {
@@ -65,7 +74,6 @@ class DiscoverPage extends HookWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-             
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -87,40 +95,46 @@ class DiscoverPage extends HookWidget {
                         ),
                         Text(
                           "Discover/$category_title",
-                          style: const TextStyle(
+                          style: TextStyle(
                               color: Colors.black,
-                              fontSize: 20,
+                              fontSize: getAdaptiveSize(context, 10.0),
                               fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
                   //TODO: Check if the discoveries are there corresnponding with the category
-                  discoveries.data?.length <=0
+                  discoveries.data?.length <= 0
                       ? Expanded(
-                    
-                        child: Center(
+                          child: Center(
                             child: Text(
-                                "There is no discoveries with the $category_title",style: TextStyle(color: Colors.grey),),
+                              "There is no discoveries with the $category_title",
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ),
-                      )
+                        )
                       :
 
                       //TODO: To reserve area for listview Expanded is use inside column with other children
 
                       Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: discoveries.data?.length,
-                            itemBuilder: (context, index) {
-                              Discover discover = discoveries.data?[index];
-
-                              //TODO: return keyword is important to return Discover item per list
-                              return DiscoverItemList(
-                                discover: discover,
-                                index: index,
-                              );
+                          child: RefreshIndicator(
+                            onRefresh: () async {
+                              discoveries.refetch();
                             },
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: discoveries.data?.length,
+                              itemBuilder: (context, index) {
+                                Discover discover = discoveries.data?[index];
+
+                                //TODO: return keyword is important to return Discover item per list
+                                return DiscoverItemList(
+                                  discover: discover,
+                                  index: index,
+                                );
+                              },
+                            ),
                           ),
                         ),
                 ],

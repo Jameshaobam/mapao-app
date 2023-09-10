@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mapao_app/screens/events.dart';
 import 'package:mapao_app/screens/homescreen.dart';
+import 'package:mapao_app/screens/profile.dart';
 import '../controller/get_maincontroller.dart';
 import 'discover_category.dart';
 
@@ -32,13 +34,16 @@ class MainPage extends StatelessWidget {
             children: [
               HomeScreen(),
               DiscoverCategoryPage(),
-              Text('data'),
-              Text("data2")
+              EventScreen(),
+              ProfileScreen(),
             ],
           ),
         ),
         bottomNavigationBar: Obx(
           () => BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            selectedFontSize: 14,
+            unselectedFontSize: 14,
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
               BottomNavigationBarItem(
