@@ -7,9 +7,14 @@ import 'package:mapao_app/models/discover_get_model.dart';
 import 'package:mapao_app/screens/detail_discover.dart';
 
 class DiscoverItemList extends StatelessWidget {
-  DiscoverItemList({super.key, required this.discover, required this.index});
+  DiscoverItemList(
+      {super.key,
+      required this.discover,
+      required this.index,
+      required this.onTap});
   final Discover discover;
   final int index;
+  final Function onTap;
 
   final MainController _mainController = Get.put(MainController());
   @override
@@ -22,13 +27,11 @@ class DiscoverItemList extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 13.0, left: 8.0, right: 8.0),
         child: ListTile(
           onTap: () {
-
-            _mainController.updateDiscover(discover);
-            Get.toNamed(DetailDiscoverPage.routeName);
+            onTap.call();
           },
           tileColor: Colors.white,
           title: Text(
-            discover.title,
+            discover.title!,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
@@ -44,21 +47,21 @@ class DiscoverItemList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               //TODO: Little description
-              discover.description.length > 10
+              discover.description!.length > 10
                   ? Text(
-                      "${discover.description.substring(0, 10)}...",
+                      "${discover.description!.substring(0, 10)}...",
                       style: const TextStyle(
                           fontSize: 15.0,
                           color: const Color.fromARGB(255, 153, 150, 150)),
                     )
-                  : Text(discover.description,
+                  : Text(discover.description!,
                       style: const TextStyle(
                           fontSize: 15.0,
                           color: Color.fromARGB(255, 153, 150, 150))),
               const SizedBox(
                 height: 5.0,
               ),
-              Text(discover.categoryFn.title,
+              Text(discover.categoryFn.title!,
                   style: const TextStyle(
                       fontSize: 15.0,
                       color: const Color.fromARGB(255, 153, 150, 150))),
@@ -71,7 +74,7 @@ class DiscoverItemList extends StatelessWidget {
                   const SizedBox(
                     width: 8.0,
                   ),
-                  Text(discover.location.based),
+                  Text(discover.location.based!),
                 ],
               )
             ],

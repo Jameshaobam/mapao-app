@@ -5,6 +5,7 @@ import 'package:mapao_app/controller/get_maincontroller.dart';
 import 'package:mapao_app/screens/login.dart';
 import 'package:mapao_app/utilities/constants.dart';
 
+import '../models/user.dart';
 import '../networking/http.dart';
 import 'package:dio/dio.dart';
 import 'package:get_storage/get_storage.dart';
@@ -15,7 +16,7 @@ class AuthController extends GetxController {
   static GetStorage authStorage = GetStorage("auth");
   static const String accessTokenKey = "access";
   static const String refreshTokenKey = "refresh";
-  RxString user = "".obs;
+  Rx<User?> user = Rx(null);
 
   final MainController mainController = Get.put(MainController());
   Future<Result> checkLoginUser() async {
@@ -29,8 +30,7 @@ class AuthController extends GetxController {
     try {
       var res = await dio.get("/account/isauth/");
 
-      user.value = res.data?["username"];
-      log(user.value);
+      user.value = User.fromJson(res.data);
 
       return Success(true);
     } catch (e) {

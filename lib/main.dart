@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fquery/fquery.dart';
 import 'package:get/get.dart';
+import 'package:mapao_app/screens/add_discover.dart';
 import 'package:mapao_app/screens/detail_discover.dart';
+import 'package:mapao_app/screens/discover_me.dart';
 import 'package:mapao_app/screens/login.dart';
 import 'package:mapao_app/screens/mainscreen.dart';
 import 'package:mapao_app/screens/splash.dart';
@@ -65,6 +67,14 @@ class MyApp extends StatelessWidget {
           name: DetailDiscoverPage.routeName,
           page: () => DetailDiscoverPage(),
         ),
+        GetPage(
+          name: DiscoverListMe.routeName,
+          page: () => DiscoverListMe(),
+        ),
+        GetPage(
+          name: AddNewDiscover.routeName,
+          page: () => AddNewDiscover(),
+        )
       ],
     );
   }

@@ -4,37 +4,26 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mapao_app/screens/add_discover.dart';
 import 'package:mapao_app/utilities/utils.dart';
 
 import '../controller/get_maincontroller.dart';
-
 import '../widgets/discover_item.dart';
 import '../models/discover_get_model.dart';
 
 import '../networking/fetch.dart';
 import 'detail_discover.dart';
 
-class DiscoverPage extends HookWidget {
-  DiscoverPage({super.key, required this.title});
-  static String routeName = "/discover";
-  final String title;
-
+class DiscoverListMe extends HookWidget {
+  DiscoverListMe({super.key});
+  static String routeName = "/discover-me";
   final MainController _mainController = Get.put(MainController());
   @override
   Widget build(BuildContext context) {
     var discoveries;
-    String categoryTitle = _mainController.categoryName.value;
-    int categoryId = _mainController.categoryId.value;
 
-    if (categoryTitle == "All") {
-      discoveries = useQuery(["discoveries"], getDiscovers,
-          refetchOnMount: RefetchOnMount.always);
-    } else {
-      discoveries = useQuery(
-          ["discoveries"], () => getCategorizedDiscoveries(categoryId),
-          refetchOnMount: RefetchOnMount.always);
-    }
-
+    discoveries = useQuery(["discoveries"], getMyDiscoveries,
+        refetchOnMount: RefetchOnMount.always);
     return SafeArea(
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 239, 254, 255),
@@ -42,9 +31,9 @@ class DiscoverPage extends HookWidget {
           automaticallyImplyLeading:
               false, //this parameter is used to remove back button in the appbar
           backgroundColor: Colors.white,
-          title: Center(
+          title: const Center(
             child: Text(
-              title,
+              "Mapao",
             ),
           ),
         ),
@@ -63,9 +52,9 @@ class DiscoverPage extends HookWidget {
               );
             }
             if (discoveries.isError) {
-              log(discoveries.error.toString());
+              // log(discoveries.error);
               return Center(
-                child: Text("Error ${discoveries.error}"),
+                child: Text("Error ${discoveries.error!}"),
               );
             }
 
@@ -81,34 +70,67 @@ class DiscoverPage extends HookWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         //TODO: Icon to go back to previous page when tap
-                        Container(
-                          padding: EdgeInsets.zero,
-                          child: GestureDetector(
-                              child: const Icon(
-                                Icons.arrow_back,
-                                size: 30,
+                        Flexible(
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                child: const Icon(
+                                  Icons.arrow_back,
+                                  size: 30,
+                                ),
+                                onTap: () => Get.back(),
                               ),
-                              onTap: () => Get.back()),
+                              const SizedBox(
+                                width: 10.0,
+                              ),
+                              Text(
+                                "My collection/discover",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: getAdaptiveSize(context, 10.0),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
+
                         const SizedBox(
-                          width: 10.0,
+                          width: 5,
                         ),
-                        Text(
-                          "Discover/$categoryTitle",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: getAdaptiveSize(context, 10.0),
-                              fontWeight: FontWeight.bold),
+                        Flexible(
+                          child: SizedBox(
+                            height: 30,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final result =
+                                    await Get.toNamed(AddNewDiscover.routeName);
+
+                                if (result != null && result == "refetch") {
+                                  discoveries.refetch();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.add),
+                                  Text("Add discover"),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
                   //TODO: Check if the discoveries are there corresnponding with the category
                   discoveries.data?.length <= 0
-                      ? Expanded(
+                      ? const Expanded(
                           child: Center(
                             child: Text(
-                              "There is no discoveries with the $categoryTitle",
+                              "There is no discoveries",
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -134,7 +156,8 @@ class DiscoverPage extends HookWidget {
                                   index: index,
                                   onTap: () async {
                                     _mainController.updateDiscover(discover);
-
+                                    _mainController.updateTitleCategory(
+                                        discover.categoryFn.title!);
                                     //Getting the argument if there is
                                     final result = await Get.toNamed(
                                         DetailDiscoverPage.routeName);

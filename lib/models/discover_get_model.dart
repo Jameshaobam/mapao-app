@@ -3,116 +3,67 @@
 //     final discover = discoverFromJson(jsonString);
 
 import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
+
+part 'discover_get_model.freezed.dart';
+part 'discover_get_model.g.dart';
 
 Discover discoverFromJson(String str) => Discover.fromJson(json.decode(str));
 
 String discoverToJson(Discover data) => json.encode(data.toJson());
 
-class Discover {
-  final int id;
-  final String title;
-  final String description;
-  final CategoryFn categoryFn;
-  final Location location;
-  final int likes;
-  final String sourceLink;
-  final String socialMediaLink;
-  final String likeUrl;
-  final String posterId;
-  final bool iseditorchoice;
-  final bool isowner;
-  final String logo;
+@freezed
+class Discover with _$Discover {
+  const factory Discover({
+    @JsonKey(name: "id") int? id,
+    @JsonKey(name: "title") String? title,
+    @JsonKey(name: "description") String? description,
+    @JsonKey(name: "category_fn") required CategoryFn categoryFn,
+    @JsonKey(name: "location") required Location location,
+    @JsonKey(name: "likes") int? likes,
+    @JsonKey(name: "source_link") String? sourceLink,
+    @JsonKey(name: "social_media_link") String? socialMediaLink,
+    @JsonKey(name: "like_url") String? likeUrl,
+    @JsonKey(name: "poster") Poster? poster,
+    @JsonKey(name: "iseditorchoice") bool? iseditorchoice,
+    @JsonKey(name: "isowner") bool? isowner,
+    @JsonKey(name: "logo") String? logo,
+  }) = _Discover;
 
-  Discover({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.categoryFn,
-    required this.location,
-    required this.likes,
-    required this.sourceLink,
-    required this.socialMediaLink,
-    required this.likeUrl,
-    required this.posterId,
-    required this.iseditorchoice,
-    required this.isowner,
-    required this.logo,
-  });
-
-  factory Discover.fromJson(Map<String, dynamic> json) => Discover(
-        id: json["id"],
-        title: json["title"] ?? "",
-        description: json["description"] ?? "",
-        categoryFn: CategoryFn.fromJson(json["category_fn"]),
-        location: Location.fromJson(json["location"]),
-        likes: json["likes"],
-        sourceLink: json["source_link"] ?? "",
-        socialMediaLink: json["social_media_link"] ?? "",
-        likeUrl: json["like_url"] ?? "",
-        posterId: json["poster_id"] ?? "",
-        iseditorchoice: json["iseditorchoice"] ?? false,
-        isowner: json["isowner"] ?? false,
-        logo: json["logo"] ?? "",
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "title": title,
-        "description": description,
-        "category_fn": categoryFn.toJson(),
-        "location": location.toJson(),
-        "likes": likes,
-        "source_link": sourceLink,
-        "social_media_link": socialMediaLink,
-        "like_url": likeUrl,
-        "poster_id": posterId,
-        "iseditorchoice": iseditorchoice,
-        "isowner": isowner,
-        "logo": logo,
-      };
+  factory Discover.fromJson(Map<String, dynamic> json) =>
+      _$DiscoverFromJson(json);
 }
 
-class CategoryFn {
-  final int id;
-  final String title;
-  final String description;
+@freezed
+class CategoryFn with _$CategoryFn {
+  const factory CategoryFn({
+    @JsonKey(name: "id") int? id,
+    @JsonKey(name: "title") String? title,
+    @JsonKey(name: "description") String? description,
+  }) = _CategoryFn;
 
-  CategoryFn({
-    required this.id,
-    required this.title,
-    required this.description,
-  });
-
-  factory CategoryFn.fromJson(Map<String, dynamic> json) => CategoryFn(
-        id: json["id"],
-        title: json["title"] ?? "",
-        description: json["description"] ?? "",
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "title": title,
-        "description": description,
-      };
+  factory CategoryFn.fromJson(Map<String, dynamic> json) =>
+      _$CategoryFnFromJson(json);
 }
 
-class Location {
-  final String origin;
-  final String based;
+@freezed
+class Location with _$Location {
+  const factory Location({
+    @JsonKey(name: "origin") String? origin,
+    @JsonKey(name: "based") String? based,
+  }) = _Location;
 
-  Location({
-    required this.origin,
-    required this.based,
-  });
+  factory Location.fromJson(Map<String, dynamic> json) =>
+      _$LocationFromJson(json);
+}
 
-  factory Location.fromJson(Map<String, dynamic> json) => Location(
-        origin: json["origin"] ?? "",
-        based: json["based"] ?? "",
-      );
+@freezed
+class Poster with _$Poster {
+  const factory Poster({
+    @JsonKey(name: "profile_id") required String profileId,
+    @JsonKey(name: "username") required String username,
+  }) = _Poster;
 
-  Map<String, dynamic> toJson() => {
-        "origin": origin,
-        "based": based,
-      };
+  factory Poster.fromJson(Map<String, dynamic> json) => _$PosterFromJson(json);
 }

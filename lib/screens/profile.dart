@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mapao_app/controller/auth.dart';
 import 'package:mapao_app/controller/get_maincontroller.dart';
+import 'package:mapao_app/screens/discover_me.dart';
 import 'package:mapao_app/screens/login.dart';
 import 'package:mapao_app/utilities/utils.dart';
 
@@ -50,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
             log("Obx ${_authController.user.value}");
             return Center(
               child: Text(
-                _authController.user.value,
+                "${_authController.user.value?.profilename}",
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -123,7 +124,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     //Email value
                     // Text("youremail@domain.com"),
-                    Text("${_authController.user.value}@gmail.com"),
+                    Text("${_authController.user.value?.profileid}"),
                   ],
                 ),
                 SizedBox(
@@ -205,7 +206,7 @@ class ProfileScreen extends StatelessWidget {
           //Expanded must be always the parent widget for scrollview if the scrollview is within the column
           Expanded(
             child: Container(
-              width: getAdaptiveSize(context, 150),
+              width: getAdaptiveSize(context, 200),
               padding: EdgeInsets.symmetric(
                 horizontal: getAdaptiveSize(context, 10.0),
               ),
@@ -215,17 +216,17 @@ class ProfileScreen extends StatelessWidget {
                     // My discoveries
                     TextButton(
                       onPressed: () {
-                        print("Go to my discoveries");
+                        Get.toNamed(DiscoverListMe.routeName);
                       },
                       style: TextButton.styleFrom(
                           foregroundColor: Colors.blue[700]),
                       child: const Row(
                         children: [
-                          Icon(Icons.explore),
+                          Flexible(flex: 1, child: Icon(Icons.explore)),
                           SizedBox(
                             width: 5.0,
                           ),
-                          Text("Discoveries"),
+                          Flexible(flex: 3, child: Text("Discoveries")),
                         ],
                       ),
                     ),

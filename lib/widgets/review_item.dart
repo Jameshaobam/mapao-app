@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mapao_app/models/review_model.dart';
 
 class ReviewItem extends StatelessWidget {
   const ReviewItem({
@@ -8,7 +9,7 @@ class ReviewItem extends StatelessWidget {
     required this.reviewer,
     required this.description,
   });
-  final String reviewer;
+  final Reviewer reviewer;
   final String description;
   // final DateTime createdTime;
   @override
@@ -23,7 +24,7 @@ class ReviewItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(reviewer),
+          Text(reviewer.username),
           const SizedBox(
             height: 9.0,
           ),

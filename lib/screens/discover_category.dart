@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
+import 'package:get/get.dart';
+import 'package:mapao_app/screens/add_discover.dart';
 
 import '../widgets/discover_category_item.dart';
 import '../networking/fetch.dart';
@@ -70,33 +72,39 @@ class DiscoverCategoryPage extends HookWidget {
               ),
               Row(
                 children: [
-                  SizedBox(
-                    height: 30,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: Text("Suggest category"),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black),
+                  Flexible(
+                    child: SizedBox(
+                      height: 30,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        child: Text("Suggest category"),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black),
+                      ),
                     ),
                   ),
                   const SizedBox(
                     width: 3.0,
                   ),
-                  SizedBox(
-                    height: 30,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(Icons.add),
-                          Text("Add discover"),
-                        ],
+                  Flexible(
+                    child: SizedBox(
+                      height: 30,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.toNamed(AddNewDiscover.routeName);
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.add),
+                            Text("Add discover"),
+                          ],
+                        ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black),
                     ),
                   ),
                 ],

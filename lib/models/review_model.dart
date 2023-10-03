@@ -2,40 +2,37 @@
 //
 //     final review = reviewFromJson(jsonString);
 
+import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
+
+part 'review_model.freezed.dart';
+part 'review_model.g.dart';
 
 Review reviewFromJson(String str) => Review.fromJson(json.decode(str));
 
 String reviewToJson(Review data) => json.encode(data.toJson());
 
-class Review {
-  final int id;
-  final int discoverItem;
-  final String reviewDescription;
-  final DateTime createdTime;
-  final String reviewer;
+@freezed
+class Review with _$Review {
+  const factory Review({
+    @JsonKey(name: "id") required int id,
+    @JsonKey(name: "discover_item") required int discoverItem,
+    @JsonKey(name: "review_description") required String reviewDescription,
+    @JsonKey(name: "created_time") required DateTime createdTime,
+    @JsonKey(name: "reviewer") required Reviewer reviewer,
+  }) = _Review;
 
-  Review({
-    required this.id,
-    required this.discoverItem,
-    required this.reviewDescription,
-    required this.createdTime,
-    required this.reviewer,
-  });
+  factory Review.fromJson(Map<String, dynamic> json) => _$ReviewFromJson(json);
+}
 
-  factory Review.fromJson(Map<String, dynamic> json) => Review(
-        id: json["id"],
-        discoverItem: json["discover_item"],
-        reviewDescription: json["review_description"],
-        createdTime: DateTime.parse(json["created_time"]),
-        reviewer: json["reviewer"],
-      );
+@freezed
+class Reviewer with _$Reviewer {
+  const factory Reviewer({
+    @JsonKey(name: "profile_id") required String profileId,
+    @JsonKey(name: "username") required String username,
+  }) = _Reviewer;
 
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "discover_item": discoverItem,
-        "review_description": reviewDescription,
-        "created_time": createdTime.toIso8601String(),
-        "reviewer": reviewer,
-      };
+  factory Reviewer.fromJson(Map<String, dynamic> json) =>
+      _$ReviewerFromJson(json);
 }
