@@ -38,8 +38,10 @@ class DiscoverItemList extends StatelessWidget {
           ),
           leading: CircleAvatar(
             radius: 30,
-            backgroundImage:
-                NetworkImage("https://picsum.photos/250?image=$index"),
+            backgroundImage: NetworkImage(
+                discover.logo == null || discover.logo!.length <= 10
+                    ? "https://picsum.photos/250?image=$index"
+                    : discover.logo!),
             onBackgroundImageError: (exception, stackTrace) => NetworkImage(
                 "https://docs.flutter.dev/assets/images/dash/dash-fainting.gif"),
           ),

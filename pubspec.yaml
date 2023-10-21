@@ -20,6 +20,8 @@ dependencies:
 
   json_annotation: ^4.8.1
   freezed: ^2.4.2
+  image_picker: ^1.0.4
+  http: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

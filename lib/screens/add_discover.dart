@@ -1,11 +1,17 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:mapao_app/models/category_model.dart';
 import 'package:mapao_app/models/discover_get_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mapao_app/utilities/constants.dart';
+import 'package:http/http.dart' as http;
 
 import '../networking/fetch.dart';
 import '../utilities/utils.dart';
@@ -35,6 +41,58 @@ class _AddNewDiscoverState extends State<AddNewDiscover> {
   final socialController = TextEditingController();
 
   get onChanged => null;
+
+  File? _image;
+  final picker = ImagePicker();
+  String? base64Image;
+  Future getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        _convertImageToBase64();
+      }
+    });
+  }
+
+  void _convertImageToBase64() async {
+    if (_image == null) {
+      // Check if the image is not null
+      return;
+    }
+
+    List<int> imageBytes =
+        await _image!.readAsBytes(); // Read the image file as bytes
+    // Convert bytes to base64 string
+    setState(() {
+      base64Image = base64Encode(imageBytes);
+    });
+    print(base64Image); // Print or use the base64Image as needed
+  }
+
+  Future<Map<String, dynamic>> uploadImage() async {
+    Map<String, dynamic> data = {};
+    try {
+      var res = await http.post(
+        Uri.parse(IMGAPI),
+        body: {
+          'image': base64Image,
+        },
+      );
+
+      if (res.statusCode == 200) {
+        final jsonResponse = jsonDecode(res.body);
+        data["url"] = jsonResponse["data"]["url"];
+        data["delete"] = jsonResponse["data"]["delete_url"];
+      } else {
+        print('Error uploading image to ImgBB. Status code: ${res.statusCode}');
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return data;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -217,41 +275,29 @@ class _AddNewDiscoverState extends State<AddNewDiscover> {
                             height: 10.0,
                           ),
                           //Category
-                          // Form(
-                          //   child: TextFormField(
-                          //     decoration: const InputDecoration(
-                          //         hintText: "Category",
-                          //         border: OutlineInputBorder(
-                          //             borderSide:
-                          //                 BorderSide(color: Colors.grey))),
-                          //     keyboardType: TextInputType.text,
-                          //   ),
-                          // ),
 
                           categoryWidget,
 
                           const SizedBox(
                             height: 10.0,
                           ),
+
                           //Logo
-                          Form(
-                            key: _formKey3,
-                            child: TextFormField(
-                              controller: logoController,
-                              decoration: const InputDecoration(
-                                  hintText: "Logo",
-                                  border: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey))),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Cannot Empty";
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.text,
-                            ),
+
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              _image == null
+                                  ? Text('No image selected.')
+                                  : Image.file(_image!,
+                                      height: 200, width: 200),
+                              ElevatedButton(
+                                onPressed: getImageFromGallery,
+                                child: Text('Pick Image from Gallery'),
+                              ),
+                            ],
                           ),
+
                           const SizedBox(
                             height: 10.0,
                           ),
@@ -345,6 +391,7 @@ class _AddNewDiscoverState extends State<AddNewDiscover> {
                           const SizedBox(
                             height: 10.0,
                           ),
+                          //Upload button
                           ElevatedButton(
                               onPressed: isUploading.value
                                   ? null
@@ -354,37 +401,52 @@ class _AddNewDiscoverState extends State<AddNewDiscover> {
                                         final title = titleController.text;
                                         final description =
                                             descriptionController.text;
-                                        final logo = logoController.text;
+
                                         final origin = originController.text;
                                         final current = currentController.text;
                                         final source = sourceController.text;
                                         final social = socialController.text;
 
-                                        var category = CategoryFn(
-                                            id: selectedCategoryValue.value);
+                                        if (_image == null) {
+                                          log("Select Image log");
+                                          isUploading.value = false;
+                                        } else {
+                                          Map<String, dynamic> imgRes =
+                                              await uploadImage();
 
-                                        var loc = Location(
-                                            based: current, origin: origin);
+                                          if (imgRes.isEmpty) {
+                                            log("Image url not found");
+                                            isUploading.value = false;
+                                          } else {
+                                            log(imgRes.toString());
+                                            var category = CategoryFn(
+                                                id: selectedCategoryValue
+                                                    .value);
 
-                                        var discover = Discover(
-                                            description: description,
-                                            logo: logo,
-                                            sourceLink: source,
-                                            socialMediaLink: social,
-                                            categoryFn: category,
-                                            location: loc,
-                                            title: title);
-                                        log('${discover}');
+                                            var loc = Location(
+                                                based: current, origin: origin);
 
-                                        var res =
-                                            await addNewDiscover(discover);
-                                        log(res.toString());
-                                        if (res["detail"] == "created") {
-                                          Get.back(result: "refetch");
-                                          Get.snackbar(
-                                              "Created", "Discover added");
+                                            var discover = Discover(
+                                                description: description,
+                                                logo: imgRes["url"],
+                                                sourceLink: source,
+                                                socialMediaLink: social,
+                                                categoryFn: category,
+                                                location: loc,
+                                                title: title);
+                                            log('${discover}');
+
+                                            var res =
+                                                await addNewDiscover(discover);
+                                            log(res.toString());
+                                            if (res["detail"] == "created") {
+                                              Get.back(result: "refetch");
+                                              Get.snackbar(
+                                                  "Created", "Discover added");
+                                            }
+                                            isUploading.value = false;
+                                          }
                                         }
-                                        isUploading.value = false;
                                       }
                                     },
                               child: Text("Upload"))

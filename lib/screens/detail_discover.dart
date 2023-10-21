@@ -120,8 +120,11 @@ class DetailDiscoverPage extends HookWidget {
                                 color: const Color.fromARGB(255, 170, 24, 24))),
                         child: CircleAvatar(
                           radius: getAdaptiveSize(context, 47),
-                          backgroundImage: const NetworkImage(
-                              'https://picsum.photos/200/300'),
+                          backgroundImage: NetworkImage(
+                              discover.logo!.length <= 10 ||
+                                      discover.logo == null
+                                  ? 'https://picsum.photos/200/300'
+                                  : discover.logo!),
                         ),
                       ),
 
@@ -424,7 +427,7 @@ class DetailDiscoverPage extends HookWidget {
 
                       //Source link
 
-                      discover.sourceLink!.trim().isNotEmpty
+                      discover.sourceLink != null
                           ? Center(
                               child: Container(
                                 width: double.infinity,
@@ -451,7 +454,8 @@ class DetailDiscoverPage extends HookWidget {
                           Container(),
 
                       //Social media link
-                      discover.socialMediaLink!.trim().isNotEmpty
+
+                      discover.socialMediaLink != null
                           ? Center(
                               child: Container(
                                 width: double.infinity,
